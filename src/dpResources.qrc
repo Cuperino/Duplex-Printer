@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/program/images">
+        <file alias="icon">resources/img/dualprint.gif</file>
+        <file alias="logo">resources/img/header.jpg</file>
+    </qresource>
+</RCC>
