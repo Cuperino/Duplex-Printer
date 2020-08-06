@@ -1,6 +1,9 @@
-# Duplex Printer
-A halfway done QT5 frontend for PSUtils, the PostScript utilities by Angus Duggan.
-The purpose of this project was to provide a GUI to simplify duplex printing on old printers that don't have this capability.
+ # Duplex Printer
+Virtual printer that adds ecological features to physical printers; features such as multiple pages per sheet, forced monochromatic, and duplex printing.
+The goal for this project is to simplify duplex printing on old and cheaper printers that are still in use and may not provide modern functionalities.
 
-## Project Status
-My original goal was to make this software multiplatform, but the software pipes approach turned out to be a lot of trouble on Windows. The so far completed parts of this program work great on Linux and Mac OS. I hope to resume development of this project someday giving support to Linux only, but since I don't know when will that be I'm releasing the source as it was 4 years ago when I wrote it.
+DuplexPrinter is a QT5 frontend for GhostScript and for PSUtils, the PostScript utilities by Angus Duggan.
+
+## Platform Support
+My original goal was to make this software crossplatform, but chaining the backend components through pipes turned out not to be a feasible software development architecture on Windows. Because of this, instead of working around it, I will only give support for Unix systems.
+Currently only Linux has support, but I have hopes to add Mac OS support after the program is complete.
