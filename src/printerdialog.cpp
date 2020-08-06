@@ -1,6 +1,6 @@
-﻿/*  Duplex Print0er
-* A virtual printer emulates various ecological features on physical printers.
-* Copyright (C) 2014  Javier Oscar Cordero Pérez <javier.cordero@upr.edu>
+﻿/*  Duplex Printer
+* Virtual printer adds ecological features to physical printers.
+* Copyright (C) 2014, 2020  Javier Oscar Cordero Pérez <javier@imaginary.tech>
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -65,10 +65,7 @@ PrinterDialog::PrinterDialog(QWidget *parent) :
 
     // VALUES FROM LAST SESSION
     ui->actionAlways_refry_PostScript->trigger();
-#if defined WINNT || WIN32
-    // Set pipe emulation by default.
-    printer->setPipeEmulation( true );
-#endif
+
     // Get MARGIN and BORDERS size from last session.
     if ( settings.contains("nup/margin") )
         printer->setMargin(settings.value("nup/margin").toInt());
@@ -211,7 +208,7 @@ void PrinterDialog::on_comboBox_Printer_currentIndexChanged(
     if ( settings.contains("Printer/"+selectedPrinter+"/PageSize") )
         currentSize = settings.value("Printer/"+selectedPrinter+"/PageSize").toString();
     else
-        currentSize = QPageSize::name(QPageSize::A4);
+        currentSize = QPageSize::name(QPageSize::Letter);
 
     // Populate load info on currently selected printer
     foreach ( QPrinterInfo printerInfo, printerList )
@@ -220,21 +217,23 @@ void PrinterDialog::on_comboBox_Printer_currentIndexChanged(
             // Send printerInfo to dPrinter library for later processing
             printer->set( printerInfo );
             // Update supported page sizes
-            QList<QPrinter::PaperSize> paperSizes =
-                    printerInfo.supportedPaperSizes();
+            QList<QPageSize> paperSizes =
+                    printerInfo.supportedPageSizes();
             // Remove duplicates, remove "Custom" and Sort using enum's order.
-            paperSizes=QSet<QPrinter::PaperSize>::fromList(paperSizes).toList();
-            qSort( paperSizes.begin(), paperSizes.end() );
-            paperSizes.removeOne( QPrinter::Custom );
+            paperSizes=QList<QPageSize>(paperSizes.begin(), paperSizes.end());
+            // std::sort( paperSizes.begin(), paperSizes.end() );
+            // paperSizes.removeOne( QPrinter::Custom ); // Deprecation related changes to the code made this operation invalid.
             // Clear comboBox and add new sizes
             ui->comboBox_PageSize->clear();
             if ( !paperSizes.isEmpty() )
-                foreach ( QPrinter::PaperSize paper, paperSizes )
+                foreach ( QPageSize paper, paperSizes )
                 {
-                    ui->comboBox_PageSize->addItem( QPageSize::name(
-                                  static_cast<QPageSize::PageSizeId>(paper) ) );
-                    compatPaperSizes << QPageSize(
-                                    static_cast<QPageSize::PageSizeId>(paper) );
+                    ui->comboBox_PageSize->addItem( paper.name()
+                        /*QPageSize::name(static_cast<QPageSize::PageSizeId>(paper) )*/
+                    );
+                    compatPaperSizes << paper
+                        /*QPageSize(static_cast<QPageSize::PageSizeId>(paper) )*/
+                    ;
                 }
             else
             {

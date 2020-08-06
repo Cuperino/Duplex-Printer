@@ -1,6 +1,6 @@
 /*  Duplex Printer
-* A virtual printer emulates various ecological features on physical printers.
-* Copyright (C) 2014  Javier Oscar Cordero Pérez <javier.cordero@upr.edu>
+* Virtual printer adds ecological features to physical printers.
+* Copyright (C) 2014, 2020  Javier Oscar Cordero Pérez <javier@imaginary.tech>
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@ dPrinter::dPrinter(QObject *parent) :
     QObject(parent)
 {
     // Default values
-    _toast=_horizontal_Layout=_leftToRight_Layout=_topToButton_Layout=_collate
+    _toast=_horizontal_Layout=_leftToRight_Layout=_topToBottom_Layout=_collate
         =true;
-    _emulatePipes=_reverse=false;
+    _reverse=false;
     _copies=_pagesPerSide=1;
     _sourceWidth=_destinationWidth=590;    // Letter size
     _sourceHeight=_destinationHeight=792;
@@ -38,11 +38,6 @@ dPrinter::dPrinter(QObject *parent) :
 }
 dPrinter::~dPrinter()
 {
-    // Delete files from hard drive, if any.
-    // Reminder: files are saved on disk when emulating pipes. Windows needs...
-    //for ( int i=0; i<6; i++ ) //6 >= PROCESSAMNT, bellow.
-        //if ( "p"+QString::number(i)+".ps" exists )
-            //QFile::remove( "p"+QString::number(i)+".ps" );
 }
 // THREAD SETUPS
 void dPrinter::setupThread_Process( QThread *cThread )
@@ -90,15 +85,6 @@ void dPrinter::consoleStreamParse( )
     Stream_A.setDevice(&inFile);
     in=&Stream_A;
 }
-void dPrinter::setPipeEmulation( bool emulate )
-{
-    _emulatePipes = emulate;
-}
-bool dPrinter::getPipeEmulation( )
-{
-    return _emulatePipes;
-}
-
 // SET OPERATIONS
 //> SET PRINTER
 void dPrinter::set(const QPrinterInfo printer)
@@ -224,11 +210,11 @@ void dPrinter::setOrientation( Orientation value )
 }
 //> SET LAYOUT ORDER
 void dPrinter::setLayout( bool horizontal_priority, bool leftToRight_reading,
-                bool topToButton_reading )
+                bool topToBottom_reading )
 {
     _horizontal_Layout = horizontal_priority;
     _leftToRight_Layout = leftToRight_reading;
-    _topToButton_Layout = topToButton_reading;
+    _topToBottom_Layout = topToBottom_reading;
 }
 //*> SET DUPLEX
 void dPrinter::setDuplex( int index )
@@ -428,22 +414,14 @@ void dPrinter::process()
     // Started signal.
     emit processProgress(0);
     //* Get Paths to each process from last session.
-#if defined (WINNT) || defined (WIN32)
-    QString GhostScript = "C:/Program Files/gs/gs9.14/bin/gswin64c.exe",
-            PSselect = "psselect",
-            PSnup = "psnup",
-            PSblank = "C:/Program Files/DualPrint/DuplexPrinter/bin/PSblank.exe",
-            //-Split = "C:/Program Files/DualPrint/DuplexPrinter/bin/wtee.exe",  //"wtee"
-            dos2unix = "C:/Program Files/DualPrint/DuplexPrinter/bin/dos2unix.exe";
-#else
+
     QString GhostScript = "gs",
             PSselect = "psselect",
             PSnup = "psnup",
             PSblank = "psblank",
             //-Split = "tee",
             dos2unix = "dos2unix";
-#endif
-    //+ Wondering if saving path in const will affect binary portabilty...
+
     const QString temp = QDir::tempPath()+"/";
     const QString outA = temp+"dpA.ps",
                   outB = temp+"dpB.ps",
@@ -458,7 +436,7 @@ void dPrinter::process()
         QStringList args; // Arguments...
         QProcess * exec;  // The Process.
     } p[PROCESSES_AMNT];
-    // Init p[array]
+    // Initialize process array
     for (int i=0; i<PROCESSES_AMNT; i++)
     {
         p[i].run = false;
@@ -468,20 +446,16 @@ void dPrinter::process()
     }
 
     // Set up arguments for each process.
-    //> p0: Toast print using PostScript. Avoid incompatibilities with PSutils.
-    if ( _toast==true || _colorProfile!=color )
+    // p0: Toast print using PostScript to prevent version incompatibilities with PSutils.
+    // This step
+    if ( _toast || _colorProfile!=color )
     {
         p[0].path = GhostScript;
         p[0].args << "-sOutputFile=-" << "-q";  // Use stdout and Quiet mode.
-        // Redirect remaining messages to STDERR
-#if defined(WINNT) || defined(WIN32)
-        p[0].args << "-sstdout=%%stderr";
-#else
-        p[0].args << "-sstdout=%stderr";
-#endif
-        p[0].args << "-dNOPAUSE" << "-dBATCH"  // Prompt nothing.
+        p[0].args << "-sstdout=%stderr";       // Redirect remaining messages to STDERR
+        p[0].args << "-dNOPAUSE" << "-dBATCH"  // Don't prompt for user input.
                   << "-sDEVICE=ps2write";      // Output in PostScript format.
-        // Convert to grayscale and use black ink or toner only.
+        // Convert to grayscale or dithered black monochrome if requested.
         if ( _colorProfile==grayscale || _colorProfile==monochrome )
             p[0].args << "-sColorConversionStrategy=Gray";
         if ( _colorProfile==monochrome )
@@ -508,7 +482,7 @@ void dPrinter::process()
                       << "-H"+QString::number(_destinationHeight);
         if (!_horizontal_Layout)
             p[2].args << "-c";
-        if (!_topToButton_Layout)
+        if (!_topToBottom_Layout)
             p[2].args << "-l";
         if (!_leftToRight_Layout)
             p[2].args << "-r";
@@ -546,24 +520,21 @@ void dPrinter::process()
             p[id].args << "-r";
         p[id].run = true;
         //> p3: Add extra blank page for duplex if the total of pages is uneven.
-        if ( total()%2==1 && total()>1 )
-        {
+        int total = this->total();
+        if ( total%2==1 && total>1 )
+            {
             p[3].path = PSblank;
             p[3].args << "1";  // Add 1 blank page.
             p[3].run = true;
 
             // EOL must be fixed when using PSBlank's stdout on Windows.
-#if defined(WINNT) || defined(WIN3)
-            p[4].path = dos2unix;
-            p[4].run = true;
-#endif
         }
     }
     //> p5duplex: Split pipe in two
     if ( _duplex==duplex )
     {
         /* Tee and wtee cannot be succesfully started from QT Framework 5.3
-        *  as of July 2014. Pipe split will be emmulated for all supported OS.
+        *  as of July 2014. Pipe split will be emmulated.
         * p[5].path = Split+" >( "+p[5].path+" "+p[5].args.join(" ")+" > "+outA+
         *            " ) >( "+p[6].path+" "+p[6].args.join(" ")+" > "+outB+" )";
         * qDebug() << p[4].path;
@@ -605,29 +576,14 @@ void dPrinter::process()
         }
 
     // Pipe remaining processes together.
-    if ( _emulatePipes )
-    {
-        // EMULATE PIPES by saving to and reading from disk.
-        // I wish there was another way, but pipes in Windows won't make their
-        // .. processes wait for input.
-        for ( int i=last-1; i>=first; i-- )
-            if ( p[i].run )
-                p[i].exec->setStandardOutputFile("dPp"+QString::number(i)+".ps");
-        for ( int i=first+1, prv=first; i<=last; i++ )
-            if ( p[i].run )
-            {
-                p[i].exec->setStandardInputFile("dPp"+QString::number(prv)+".ps");
-                prv=i; // previous
-            }
-    }
-    else
-        // USE REGULAR PIPES
-        for ( int i=last-1, next=last; i>=first; i-- )
-            if ( p[i].run )
-            {
-                p[i].exec->setStandardOutputProcess( p[next].exec );
-                next=i;
-            }
+
+    // USE PIPES
+    for ( int i=last-1, next=last; i>=first; i-- )
+        if ( p[i].run )
+        {
+            p[i].exec->setStandardOutputProcess( p[next].exec );
+            next=i;
+        }
 
     // Start main pipe.
     for ( int i=first; i<=last; i++ )
@@ -640,16 +596,11 @@ void dPrinter::process()
             //    p[i].exec->start( p[i].path );
             //else
                 p[i].exec->start( p[i].path, p[i].args );
-            if ( _emulatePipes && !p[i].exec->waitForFinished( 40000 ) )
-            {
-                emit error( 100+i, tr("Something went wrong down the pipes.") );
-                return;
-            }
         }
 
     // Always wait for last process of main pipe to finish.
     //+ Wait for finished cannot be run twice in a row or will return fail.
-    if ( !_emulatePipes && !p[last].exec->waitForFinished( 25000 ) )
+    if ( !p[last].exec->waitForFinished( 25000 ) )
     {
         emit error( 100+last, tr("Something went wrong down the pipes.") );
         return ;//last;
@@ -736,38 +687,11 @@ void dPrinter::print( QString file )
     //* Get path from last session.
     QStringList args;
 
-#if defined (WINNT) || defined (WIN32)
-
-    // WORKING - GSview silent print
-    QString path = "C:/Program Files/Ghostgum/gsview/gsprint.exe";
-    args << "-printer" << _printer.printerName()
-         << "-copies" << QString::number(_copies);
-    if ( _colorProfile==monochrome )
-        args << "-mono";
-    else if ( _colorProfile==grayscale )
-        args << "-gray";
-    else
-        args << "-color";
-    // Other "default" values and file
-    args << "-noquery"
-         << "-portrait" // orientation changes are done automatically by PSnup.
-         << QDir::toNativeSeparators( file );
-
-    // NON FUNCTIONAL - GhostScript silent print
-    //QString path = "C:/Program Files/gs/gs9.14/bin/gswin64c.exe";
-    //args //<< "-dNOPAUSE" << "-dBATCH"  // Prompt nothing.
-    //     << "-sDEVICE=mswinpr"
-    //     << "-dNoCancel"
-    //     << "-sOutputFile=\"%%printer%%"+_printer.printerName()+"\""  // Will only work with printer names that contain no spaces.
-    //     << "-";
-
-#else
     // OS X and LINUX
     QString path = "lpr";
     args << "-P" << _printer.printerName()
          << "-#" //<< _copies
          << QDir::toNativeSeparators(file);
-#endif
 
     QProcess *exec = new QProcess( this );
     //exec->setStandardInputFile( file );

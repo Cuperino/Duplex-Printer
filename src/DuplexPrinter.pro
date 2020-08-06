@@ -2,7 +2,7 @@
 #
 #  Duplex Printer
 #  A virtual printer emulates various ecological features on physical printers.
-#  Copyright (C) 2014  Javier Oscar Cordero Pérez <javier.cordero@upr.edu>
+#  Copyright (C) 2014, 2020  Javier Oscar Cordero Pérez <javier@imaginary.tech>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

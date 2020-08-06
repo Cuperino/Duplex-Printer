@@ -1,6 +1,6 @@
 /*  Duplex Printer
-* A virtual printer emulates various ecological features on physical printers.
-* Copyright (C) 2014  Javier Oscar Cordero Pérez <javier.cordero@upr.edu>
+* Virtual printer adds ecological features to physical printers.
+* Copyright (C) 2014, 2020  Javier Oscar Cordero Pérez <javier@imaginary.tech>
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -49,8 +49,6 @@ public:
     void set(QPrinterInfo);
     QPrinterInfo getPrinter();
     int setFileLoc( const QString & );
-    void setPipeEmulation( bool );
-    bool getPipeEmulation( );
     // INSTRUCTIONS FROM UI
     void setSourceHeight( qreal );
     void setSourceWidth( qreal );
@@ -95,7 +93,7 @@ private:
     int _margin, _border, _pagesPerSide, _copies;
     qreal _sourceWidth, _destinationWidth, _sourceHeight, _destinationHeight;
     bool _emulatePipes, _toast, _horizontal_Layout, _leftToRight_Layout,
-         _topToButton_Layout, _reverse, _collate;
+         _topToBottom_Layout, _reverse, _collate;
     //> File Processing
     QFile _File_A, _File_B;
     QTextStream /*QFile*/ Stream_A, Stream_B, *in, *out;

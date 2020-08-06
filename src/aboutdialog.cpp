@@ -1,6 +1,6 @@
 /*  Duplex Printer
-* A virtual printer emulates various ecological features on physical printers.
-* Copyright (C) 2014  Javier Oscar Cordero Pérez <javier.cordero@upr.edu>
+* Virtual printer adds ecological features to physical printers.
+* Copyright (C) 2014, 2020  Javier Oscar Cordero Pérez <javier@imaginary.tech>
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
     ui->label_Version->setText("v. "+QCoreApplication::applicationVersion());
     ui->pushButton_Website->setText("www."+QCoreApplication::organizationDomain());
     ui->label_Contributions->setText(
-"Ghostscript by Artifex Software, Inc. (C) 1988-2014\n\
+"Ghostscript by Artifex Software, Inc. (C) 1988-2020\n\
 GSView by Ghostgum Software Pty Ltd. (C) 1993-2012\n\
 PS Utilities by Angus J. C. Duggan. (C) 1991-1995\n\
 PSblank by Javier O. Cordero Pérez. (C) 2014\n" );
