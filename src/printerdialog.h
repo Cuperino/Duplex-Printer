@@ -97,7 +97,7 @@ private slots:
 
     void on_actionAlways_refry_PostScript_triggered(bool checked);
 
-    void on_pushButton_ManageProfiles_clicked();
+    void on_pushButton_Margins_clicked();
 
     // Handmade
     void progressPlusPlus( bool reset=false );

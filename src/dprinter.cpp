@@ -462,6 +462,7 @@ void dPrinter::process()
             p[0].args << "-sProcessColorModel=DeviceGray";
         p[0].args << "-";                      // Use stdin.
         p[0].run = true;
+        qDebug() << "toast";
     }
     //> p1: Prepare PSselect for Page Selection if necesary.
     if ( static_cast<bool>( QString::compare(
@@ -470,6 +471,7 @@ void dPrinter::process()
         p[1].path = PSselect;
         p[1].args << "-q" << "-p"+_selection;
         p[1].run = true;
+        qDebug() << "psselect";
     }
     //> p2: Prepare PSnUp only if more than one page per side will be printed.
     if ( _pagesPerSide>1 )
@@ -489,15 +491,17 @@ void dPrinter::process()
         p[2].args     << "-m"+QString::number(_margin)
                       << "-b"+QString::number(_border)
                       << "-d1" // Draw border line 1 point width.
-                      << "-nup" << QString::number(_pagesPerSide);
+                      << "-n" << QString::number(_pagesPerSide); /*"-nup"*/
         p[2].run = true;
-    }    
+        qDebug() << "psnup";
+    }
     //> p5single: FIRST PRINT => single & reverse
     if ( _reverse && _duplex==single )
     {
         p[5].path = PSselect;
         p[5].args << "-q" << "-r";
         p[5].run = true;
+        qDebug() << "reverse single";
     }
     //> p5odd || 6: => odd, duplex + reverse
     else if ( _duplex==odd || _duplex==duplex )
@@ -505,9 +509,12 @@ void dPrinter::process()
         int id = _duplex==odd? 5 : 6;
         p[id].path = PSselect;
         p[id].args << "-q" << "-o";
-        if ( _duplex==duplex? true : _reverse )
+        if ( _duplex==duplex? true : _reverse ) {
             p[id].args << "-r";
+            qDebug() << "reverse";
+        }
         p[id].run = true; // Only p[4] will start by QT, duplex case does Split.
+        qDebug() << "odd or duplex";
     }
     //> p5even || 7: => even + reverse, duplex <= SECOND PRINT
     //>> p3: Blank page
@@ -516,16 +523,20 @@ void dPrinter::process()
         int id = _duplex==even? 5 : 7;
         p[id].path = PSselect;
         p[id].args << "-q" << "-e";
-        if ( _reverse )
+        if ( _reverse ) {
             p[id].args << "-r";
+            qDebug() << "reverse";
+        }
         p[id].run = true;
         //> p3: Add extra blank page for duplex if the total of pages is uneven.
         int total = this->total();
+        qDebug() << "even or duplex";
         if ( total%2==1 && total>1 )
             {
             p[3].path = PSblank;
             p[3].args << "1";  // Add 1 blank page.
             p[3].run = true;
+            qDebug() << "psblank";
 
             // EOL must be fixed when using PSBlank's stdout on Windows.
         }
@@ -541,6 +552,7 @@ void dPrinter::process()
         * p[5].run = true;
         */
         // Prevent split receiving process from being started on the main pipe.
+        qDebug() << "duplex";
         p[PROCESSES_AMNT-2].run = p[PROCESSES_AMNT-1].run = false; // p6 & 7 false
     }
 
@@ -570,8 +582,10 @@ void dPrinter::process()
         if ( p[i].run )
         {
             first=i;
-            if ( _inFileName!="" )
+            if ( _inFileName!="" ) {
+                qDebug() << "Source: " << _inFileName;
                 p[first].exec->setStandardInputFile( _inFileName );
+            }
             break;
         }
 
@@ -590,12 +604,10 @@ void dPrinter::process()
         if ( p[i].run )
         {
             // Started signal.
+            qDebug() << "Current:" << i;
             emit processProgress(i+1);  // Process will be 1 above process #.
             p[i].exec->setStandardErrorFile(temp+"dP"+QString::number(i)+".log");
-            //if ( p[i].args.isEmpty() )
-            //    p[i].exec->start( p[i].path );
-            //else
-                p[i].exec->start( p[i].path, p[i].args );
+            p[i].exec->start( p[i].path, p[i].args );
         }
 
     // Always wait for last process of main pipe to finish.
@@ -653,7 +665,7 @@ void dPrinter::process()
     p[OUT].exec->setStandardOutputFile( "debug.ps" );
 
     // STDERR
-    xwp[IN].exec->setStandardErrorFile( "p"+QString::number(IN)+".txt" );
+    p[IN].exec->setStandardErrorFile( "p"+QString::number(IN)+".txt" );
     p[PIPE].exec->setStandardErrorFile( "p"+QString::number(PIPE)+".txt" );
     p[OUT].exec->setStandardErrorFile( "p"+QString::number(OUT)+".txt" );
 
@@ -688,9 +700,10 @@ void dPrinter::print( QString file )
     QStringList args;
 
     // OS X and LINUX
+    qDebug() << "Sending print to " << _printer.printerName() << "\t" << QDir::toNativeSeparators(file);
     QString path = "lpr";
     args << "-P" << _printer.printerName()
-         << "-#" //<< _copies
+         << "-#" << QString::number(_copies)
          << QDir::toNativeSeparators(file);
 
     QProcess *exec = new QProcess( this );

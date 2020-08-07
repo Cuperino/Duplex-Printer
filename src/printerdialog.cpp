@@ -150,7 +150,7 @@ void PrinterDialog::on_actionOpen_triggered()
 {
     // Get file address from user
     QString filename = QFileDialog::getOpenFileName(
-                this, tr("Open PostScript File"), "C:/",
+                this, tr("Open PostScript File"), "~",
                 tr("PostScript (*.ps);;All files (*.*)") );
     // Open file
     QFile file(filename);
@@ -162,6 +162,7 @@ void PrinterDialog::on_actionOpen_triggered()
     }
 
     // File located succesfully.
+    printer->setFileLoc( filename );
     loadFile();
 }
 
@@ -430,11 +431,14 @@ void PrinterDialog::on_comboBox_ColorProfile_currentIndexChanged( int index )
     printer->setColorProfile(index);
 }
 //> MANAGE COLOR PROFILES
-void PrinterDialog::on_pushButton_ManageProfiles_clicked()
+void PrinterDialog::on_pushButton_Margins_clicked()
 {
+}
+//void PrinterDialog::on_pushButton_ManageProfiles_clicked()
+//{
     //> Allow user to create and use custom ICC Color profiles
     //+ Not yet implemented.
-}
+//}
 //> SET COPIES
 void PrinterDialog::on_spinBox_Copies_valueChanged( int value )
 {
