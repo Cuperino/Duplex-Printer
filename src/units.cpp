@@ -17,9 +17,9 @@
 */
 #include "units.h"
 
-units::units()
+Units::Units()
 {
-    // UNITS MAP The user may specify margins & borders in their unit of choice.
+    // Units MAP The user may specify margins & borders in their unit of choice.
     // This will garantee a good render, since every OS aproximates differently.
     _units.insert( "in", 1.0 );
     _units.insert( "ft", 12.0 );
@@ -30,7 +30,7 @@ units::units()
     _units.insert( "mm", 0.1 / 2.54 );
 }
 
-float units::factor( QString unit )
+float Units::factor( QString unit )
 {
     QMapIterator<QString,float> iter(_units);
     do
@@ -43,7 +43,7 @@ float units::factor( QString unit )
     return 0;
 }
 
-QList<QString> units::list()
+QList<QString> Units::list()
 {
     return _units.keys();
 }

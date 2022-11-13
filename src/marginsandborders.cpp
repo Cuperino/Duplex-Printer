@@ -24,7 +24,7 @@ MarginsAndBorders::MarginsAndBorders(QWidget *parent) :
 {
     ui->setupUi(this);
     // Get supported units from units class
-    u = new units;
+    u = new Units;
     QStringList list = u->list();
     modelUnits = new QStringListModel(this);
     modelUnits->setStringList( list );
@@ -52,7 +52,7 @@ MarginsAndBorders::~MarginsAndBorders()
 
 void MarginsAndBorders::on_buttonBox_accepted()
 {
-    units unit;
+    Units unit;
     QSettings settings;
 
     // Get values from user input.

@@ -42,7 +42,7 @@ private slots:
 
 private:
     Ui::MarginsAndBorders *ui;
-    units *u;
+    Units *u;
     QStringListModel *modelUnits;
 };
 

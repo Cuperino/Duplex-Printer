@@ -21,7 +21,6 @@
 #include <QDialog>
 #include <QDir>
 #include <QMessageBox>
-#include "duplex.h"
 #include "dprinter.h"
 
 namespace Ui {

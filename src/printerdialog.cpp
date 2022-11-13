@@ -19,6 +19,14 @@
 #include "printerdialog.h"
 #include "ui_printerdialog.h"
 
+// Duplex emulation
+#include "duplex.h"
+#include "duplexsetupdialog.h"
+#include "duplexdialog.h"
+// Remaining windows
+#include "marginsandborders.h"
+#include "aboutdialog.h"
+
 // CONSTRUCTOR
 // Get printers, use default and Set values from last session.
 PrinterDialog::PrinterDialog(QWidget *parent) :
@@ -201,7 +209,7 @@ void PrinterDialog::loadFile()
 }
 
 // PRINTER IS SELECTED, load referencial printer data.
-void PrinterDialog::on_comboBox_Printer_currentIndexChanged(
+void PrinterDialog::on_comboBox_Printer_currentTextChanged(
                                                 const QString &selectedPrinter )
 {
     //Get current page value or value from last session.
@@ -412,7 +420,7 @@ void PrinterDialog::on_checkBox_Reverse_toggled(bool checked)
     printer->setReverse(checked);
 }
 //> SET PAGE SIZE
-void PrinterDialog::on_comboBox_PageSize_currentIndexChanged(
+void PrinterDialog::on_comboBox_PageSize_currentTextChanged(
                                                        const QString &pageName )
 {
     QString selectedPrinter = ui->comboBox_Printer->currentText();

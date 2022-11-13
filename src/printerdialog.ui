@@ -191,8 +191,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>860</width>
-         <height>116</height>
+         <width>872</width>
+         <height>137</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -287,7 +287,7 @@
         <item>
          <widget class="QGroupBox" name="groupBoxLayout">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>1</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -313,7 +313,7 @@
              <item>
               <widget class="QLabel" name="labelPagesPerSide">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -484,9 +484,6 @@
              </property>
              <property name="styleSheet">
               <string notr="true">background-color: none;</string>
-             </property>
-             <property name="sizeAdjustPolicy">
-              <enum>QComboBox::AdjustToMinimumContentsLength</enum>
              </property>
              <item>
               <property name="text">
@@ -674,7 +671,7 @@
             <x>0</x>
             <y>0</y>
             <width>836</width>
-            <height>190</height>
+            <height>136</height>
            </rect>
           </property>
          </widget>
@@ -774,7 +771,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>20</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

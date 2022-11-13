@@ -17,6 +17,8 @@
 */
 #include "dprinter.h"
 
+#include "units.h"
+
 // CONSTRUCTORS AND DECONSTRUCTOR
 dPrinter::dPrinter(QObject *parent) :
     QObject(parent)
@@ -102,7 +104,7 @@ void dPrinter::setMargin( int margin )
 }
 void dPrinter::setMargin( float base, QString factor )
 {
-    units unit;
+    Units unit;
     setMargin( base*72*unit.factor( factor ) );
 }
 void dPrinter::setBorder( int border )
@@ -111,7 +113,7 @@ void dPrinter::setBorder( int border )
 }
 void dPrinter::setBorder( float base, QString  factor )
 {
-    units unit;
+    Units unit;
     setBorder( base*72*unit.factor( factor ) );
 }
 //> SET SOURCE PAGE SIZE

@@ -18,6 +18,8 @@
 #include "duplexdialog.h"
 #include "ui_duplexdialog.h"
 
+#include "duplex.h"
+
 DuplexDialog::DuplexDialog(QWidget *parent, QString Printer) :
     QDialog(parent),
     ui(new Ui::DuplexDialog)

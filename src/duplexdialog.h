@@ -20,8 +20,6 @@
 
 #include <QDialog>
 #include <QAbstractButton>
-#include "duplex.h"
-
 #include <QDebug>
 
 namespace Ui {

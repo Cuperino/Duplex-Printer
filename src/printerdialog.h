@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSettings>
 // Multiplatform support for information on printers.
 #include <QtPrintSupport/QPrinterInfo>
 #include <QPageSize>
@@ -32,13 +33,6 @@
 #include <QTimer>
 // dPrinter does the work requested through UI
 #include "dprinter.h"
-// Duplex emulation
-#include "duplex.h"
-#include "duplexsetupdialog.h"
-#include "duplexdialog.h"
-// Remaining windows
-#include "marginsandborders.h"
-#include "aboutdialog.h"
 
 namespace Ui {
 class PrinterDialog;
@@ -65,7 +59,7 @@ private slots:
 
     void on_actionOpen_triggered();
 
-    void on_comboBox_Printer_currentIndexChanged(const QString &arg1);
+    void on_comboBox_Printer_currentTextChanged(const QString &arg1);
 
     void on_radioButton_RangeWhole_toggled(bool checked);
 
@@ -85,7 +79,7 @@ private slots:
 
     void on_comboBox_Duplex_currentIndexChanged(int index);
 
-    void on_comboBox_PageSize_currentIndexChanged(const QString &pageName);
+    void on_comboBox_PageSize_currentTextChanged(const QString &pageName);
 
     void on_comboBox_ColorProfile_currentIndexChanged(int index);
 

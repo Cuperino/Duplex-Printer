@@ -18,6 +18,8 @@
 #include "duplexsetupdialog.h"
 #include "ui_duplexsetupdialog.h"
 
+#include "duplex.h"
+
 DuplexSetupDialog::DuplexSetupDialog(QWidget *parent, dPrinter *engine ) :
     QDialog(parent),
     ui(new Ui::DuplexSetupDialog)

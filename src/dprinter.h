@@ -21,7 +21,6 @@
 #include <QObject>
 #include <QThread>
 #include <QString>
-#include "units.h"
 // File management
 #include <QTextStream>
 #include <QFile>

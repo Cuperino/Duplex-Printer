@@ -21,10 +21,10 @@
 #include <QString>
 #include <QMap>
 
-class units
+class Units
 {
 public:
-    units();
+    Units();
     float factor( QString );
     QList<QString> list();
 private:
